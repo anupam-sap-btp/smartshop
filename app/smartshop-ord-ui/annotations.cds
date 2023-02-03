@@ -1,0 +1,1 @@
+using TransactionService as service from '../../srv/shop-transaction';
