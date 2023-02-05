@@ -13,6 +13,14 @@ annotate TransactionService.Products with {
 annotate TransactionService.Orders with @(
     // Capabilities.UpdateRestrictions: {Updatable: false},
     // Capabilities: {DeleteRestrictions : { Deletable: false}},
+    Common.SideEffects #CustomerChanged : {
+          SourceProperties : [
+               customer_ID
+          ],
+          TargetEntities : [
+               customer
+          ]
+     },
     UI: {
         LineItem  : [
             {$Type: 'UI.DataField', Value: orderNo, Label: 'Order Number'},
@@ -50,7 +58,7 @@ annotate TransactionService.Orders with @(
             Data: [
                 {$Type: 'UI.DataField', Value: orderNo, Label: 'Order Number'},
                 {$Type: 'UI.DataField', Value: customer_ID, Label: 'Customer ID'},
-                {$Type: 'UI.DataField', Value: customer.firstName, Label: 'Customer Name', ![@Common.FieldControl] : #ReadOnly,},
+                {$Type: 'UI.DataField', Value: customer.firstName, Label: 'Customer Name', ![@Common.FieldControl] : #ReadOnly},
                 {$Type: 'UI.DataField', Value: totalPrice, Label: 'Total Price'},
                 {$Type: 'UI.DataField', Value: createdAt, Label: 'Order Date'},
                 {$Type: 'UI.DataField', Value: orderStatus, Label: 'Status'},
@@ -64,9 +72,31 @@ annotate TransactionService.Orders with @(
             ]
         },
     }
-);
+){
+    customer @(title : 'Customer',
+            Common.ValueListWithFixedValues: false,
+            Common.ValueList: {
+                CollectionPath: 'Customers',
+                SearchSupported: true,
+                Parameters: [
+                    {$Type: 'Common.ValueListParameterInOut', LocalDataProperty: 'customer_ID', ValueListProperty: 'ID' },
+                    {$Type: 'Common.ValueListParameterDisplayOnly', ValueListProperty: 'lastName' },
+                    {$Type: 'Common.ValueListParameterDisplayOnly', ValueListProperty: 'city' },
+                    {$Type: 'Common.ValueListParameterDisplayOnly', ValueListProperty: 'creditStatus' },
+                ]
+            }
+    );
+};
 
 annotate TransactionService.Items with @(
+    Common.SideEffects #ProductChanged : {
+          SourceProperties : [
+               product_ID,
+            ],
+          TargetEntities : [
+               product
+          ]
+     },
     UI: {
         HeaderInfo  : {
             $Type : 'UI.HeaderInfoType',
@@ -96,4 +126,18 @@ annotate TransactionService.Items with @(
             ]
         },
     }    
-);
+){
+    product @(title : 'Product',
+            Common.ValueListWithFixedValues: false,
+            Common.ValueList: {
+                CollectionPath: 'Products',
+                SearchSupported: true,
+                Parameters: [
+                    {$Type: 'Common.ValueListParameterInOut', LocalDataProperty: 'product_ID', ValueListProperty: 'ID' },
+                    {$Type: 'Common.ValueListParameterDisplayOnly', ValueListProperty: 'category' },
+                    {$Type: 'Common.ValueListParameterOut', LocalDataProperty: 'unitPrice', ValueListProperty: 'price' },
+                    {$Type: 'Common.ValueListParameterOut', LocalDataProperty: 'unit', ValueListProperty: 'unit' },
+                ]
+            }
+    );
+};

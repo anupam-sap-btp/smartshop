@@ -1,5 +1,5 @@
 const cds = require('@sap/cds');
-const { Customers } = cds.entities('smartshop.db');
+const { Customers, Products } = cds.entities('smartshop.db');
 
 module.exports = cds.service.impl( (srv) => {
     //Set new customers' credit status to review

@@ -2,7 +2,7 @@ using { smartshop.db as shopdb } from '../db/schema';
 
 service TransactionService {
 
-    @readonly entity Customers as projection on shopdb.Customers excluding { creditStatus, createdAt, createdBy, modifiedAt, modifiedBy };
+    @readonly entity Customers as projection on shopdb.Customers excluding { createdAt, createdBy, modifiedAt, modifiedBy };
     @readonly entity Products as projection on shopdb.Products excluding { createdAt, createdBy, modifiedAt, modifiedBy };
     
     @odata.draft.enabled

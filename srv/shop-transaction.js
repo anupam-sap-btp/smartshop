@@ -5,14 +5,14 @@ module.exports = cds.service.impl( (srv) => {
     srv.before(['SAVE'], 'Orders', async (req) => {
 
         if (req.data.items == undefined) {return }
-        else if (req.data.items.length == 0) { req.error(507, "No items specified." ); }
+        else if (req.data.items.length == 0) { req.error({code: 507, message: "No items specified."} ); return; }
         
         //Get customer information and throw error if it's not active
         await cds.tx(req).run(SELECT.from(Customers).where({ID: req.data.customer_ID}))
-        .then(resolve => {console.log("Customer Select>>>>", resolve);
-        if (resolve.length === 0) {req.error("Customer not found");}
-        else if (resolve[0].creditStatus != 'active') {req.error("Customer is blocked");}
-        });
+        .then(async resolve => {console.log("Customer Select>>>>", resolve);
+        if (resolve.length === 0) {req.error(508, "Customer not found");}
+        else if (resolve[0].creditStatus != 'active') {req.error(509, "Customer is blocked");}
+        else {
 
         //Get product details from the line items in the order
         await cds.tx(req).run(SELECT.from(Products)
@@ -66,7 +66,8 @@ module.exports = cds.service.impl( (srv) => {
             } else {
                 req.data.orderStatus = 'Okay';
             }
-        });
+        }); 
+        }});
     });
 
     srv.after('READ', 'Orders', (lines) => { 
