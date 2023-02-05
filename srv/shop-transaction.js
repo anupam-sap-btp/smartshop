@@ -5,13 +5,13 @@ module.exports = cds.service.impl( (srv) => {
     srv.before(['SAVE'], 'Orders', async (req) => {
 
         if (req.data.items == undefined) {return }
-        else if (req.data.items.length == 0) { req.error({code: 507, message: "No items specified."} ); return; }
+        else if (req.data.items.length == 0) { req.error({code: 405, message: "No items specified."} ); return; }
         
         //Get customer information and throw error if it's not active
         await cds.tx(req).run(SELECT.from(Customers).where({ID: req.data.customer_ID}))
         .then(async resolve => {console.log("Customer Select>>>>", resolve);
-        if (resolve.length === 0) {req.error(508, "Customer not found");}
-        else if (resolve[0].creditStatus != 'active') {req.error(509, "Customer is blocked");}
+        if (resolve.length === 0) {req.error(405, "Customer not found");}
+        else if (resolve[0].creditStatus != 'active') {req.error(405, "Customer is blocked");}
         else {
 
         //Get product details from the line items in the order
@@ -29,12 +29,12 @@ module.exports = cds.service.impl( (srv) => {
                 let prod = prodsFetched.find(o=> o.ID === item.product_ID);
                 if (prod == undefined ) {
                     //Throw error if product provided at the item is not available
-                    req.error(505, "Product not found.");} 
+                    req.error(405, "Product not found.");} 
                 else {
                     // console.log(prod);
                     //Check stock and update price
                     if (prod.stock < item.quantity) {
-                        req.error(506, "Not enough stock");
+                        req.error(405, "Not enough stock");
                     } else if (prod.price != item.unitPrice) {
                         item.unitPrice = prod.price;
                         req.notify(208, "Product price updated.");
@@ -48,7 +48,7 @@ module.exports = cds.service.impl( (srv) => {
                     //Reduce stock quantity based on the item quantity received
                     cds.tx(req).run(UPDATE(Products)
                          .set('stock -=', item.quantity).where('ID =', item.product_ID))
-                         .then(result => {if (result[0] === 0) req.error(506, "Error updating stock");});
+                         .then(result => {if (result[0] === 0) req.error(405, "Error updating stock");});
 
                 }
                 

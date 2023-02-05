@@ -26,6 +26,9 @@ module.exports = cds.service.impl( (srv) => {
     //Pass the image link to image field in creation mode as the upload image option is not available
     srv.before(['CREATE', 'NEW', 'UPDATE', 'SAVE', 'EDIT'], 'Products', (req) => req.data.image = req.data.imgTxt);
     
+    //While creating the Product, set the stock as zero
+    srv.before(['CREATE', 'SAVE'], 'Products', req => req.data.stock = 0);
+
     //Action - Add stock
     srv.on('AddStock', add_stock);
 
