@@ -56,8 +56,8 @@ annotate MasterService.Products with @(
         },
     }
 ) {
-    ID @( Common: { Label : 'Product ID' } );
-    name @( Common: { Label : 'Description' } );
+    ID @( Common: { Label : 'New Product ID' } );
+    name @( Common: { Label : 'New Description' } );
     category @(Common: {Label : 'Category',});
     price @(Common: {Label : 'Price',});
     currency_code @(Common: {Label : 'Currency'});

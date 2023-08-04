@@ -1,7 +1,7 @@
 _schema-version: "3.1"
 ID: smartshop
 description: A simple CAP project.
-version: 1.0.0
+version: 1.0.1
 modules:
 - name: smartshop-srv
   type: nodejs
@@ -148,6 +148,9 @@ resources:
 - name: uaa_smartshop
   type: org.cloudfoundry.managed-service
   parameters:
+    config:
+      tenant-mode: dedicated
+      xsappname: appexp-${org}-${space}
     path: ./xs-security.json
     service: xsuaa
     service-name: smartshop-xsuaa-service
