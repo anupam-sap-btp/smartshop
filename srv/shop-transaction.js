@@ -1,4 +1,6 @@
 const cds = require('@sap/cds');
+const {executeHttpRequest} = require('@sap-cloud-sdk/http-client');
+const { retrieveJwt } = require('@sap-cloud-sdk/connectivity');
 const { Customers, Products, Orders } = cds.entities('smartshop.db');
 
 module.exports = cds.service.impl( (srv) => {
@@ -70,6 +72,35 @@ module.exports = cds.service.impl( (srv) => {
         }});
     });
 
+    srv.after('SAVE', 'Orders', async (lines, req) => {
+        console.log('Save Orders New' + lines);
+        let jwt = retrieveJwt(req);
+        if ( lines.orderStatus == 'Pending' ) {
+            //Get customer name
+            let cust_det = await SELECT.one.from(Customers).columns('firstName', 'lastName').where({ID: lines.customer_ID});
+            if (cust_det) {
+                var cust_name = cust_det.firstName + ' ' + cust_det.lastName;
+            }
+
+            //Call for workflow approval
+            const retData = await executeHttpRequest(
+                {destinationName: 'OrderApproval', jwt: jwt},
+                {method: 'post', 
+                 url: '/workflow/rest/v1/workflow-instances',
+                data: {
+                    "definitionId": "us10.da3646aatrial.orderapproval.orderapproval",
+                    "context": {
+                        "orderId": lines.ID,
+                        "customerId": lines.customer_ID,
+                        "customerName": cust_name,
+                        "totalPrice": lines.totalPrice.toString(),
+                        "orderNumber": lines.orderNumber,
+                        "active": true
+                    }
+                }
+                });
+        } 
+    });
     srv.after('READ', 'Orders', (lines) => { 
         //Update the actionEnabled field based on order status. This would be
         //used for enabling the action buttons(approve/reject)

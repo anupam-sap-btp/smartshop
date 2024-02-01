@@ -9,6 +9,7 @@ modules:
   requires:
   - name: smartshop-db
   - name: uaa_smartshop
+  - name: smartshop-destination-service
   provides:
   - name: srv-api
     properties:
