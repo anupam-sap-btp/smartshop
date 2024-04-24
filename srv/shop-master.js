@@ -38,7 +38,7 @@ module.exports = cds.service.impl( (srv) => {
         if(Array.isArray(lines)) {
         lines.map((line) => line.addStockEnabled = line.stock < 10) }
         else {
-            lines.activateEnabled = lines.addS < 10;
+            lines.addStockEnabled = lines.stock < 10;
         }
     } );
 });
@@ -48,6 +48,13 @@ async function add_stock(req) {
     console.log(req.params)
     const stockVal = req.data.stock;
     const prodID = req.params[0].ID;
+
+    //Get current stock for the product ID
+    let prodData = await cds.tx(req).run(SELECT(Products).where('ID =', prodID));
+    if ( prodData[0] == undefined )
+    { req.reject(404, "Product not found."); }
+    else if (prodData[0].stock >= 10 )
+    { req.reject(405, "Enough stock Available");}
 
     //Update stock with the value entered
     await cds.tx(req).run(UPDATE(Products).set('stock +=', stockVal).where('ID =', prodID))

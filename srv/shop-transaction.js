@@ -2,6 +2,7 @@ const cds = require('@sap/cds');
 const {executeHttpRequest} = require('@sap-cloud-sdk/http-client');
 const { retrieveJwt } = require('@sap-cloud-sdk/connectivity');
 const { Customers, Products, Orders } = cds.entities('smartshop.db');
+const call_dest = require('./lib/callDestinations');
 
 module.exports = cds.service.impl( (srv) => {
     srv.before(['SAVE'], 'Orders', async (req) => {
@@ -83,22 +84,10 @@ module.exports = cds.service.impl( (srv) => {
             }
 
             //Call for workflow approval
-            const retData = await executeHttpRequest(
-                {destinationName: 'OrderApproval', jwt: jwt},
-                {method: 'post', 
-                 url: '/workflow/rest/v1/workflow-instances',
-                data: {
-                    "definitionId": "us10.da3646aatrial.orderapproval.orderapproval",
-                    "context": {
-                        "orderId": lines.ID,
-                        "customerId": lines.customer_ID,
-                        "customerName": cust_name,
-                        "totalPrice": lines.totalPrice.toString(),
-                        "orderNumber": lines.orderNumber,
-                        "active": true
-                    }
-                }
-                });
+            await test_workflow(lines, cust_name);
+            await trigger_workflow(lines, cust_name);
+            await call_dest.trigger_workflow_module(lines, cust_name);
+            
         } 
     });
     srv.after('READ', 'Orders', (lines) => { 
@@ -146,7 +135,31 @@ module.exports = cds.service.impl( (srv) => {
     //Action - Reject
     srv.on('RejectOrder', reject_order);
 
+    //test
+    async function test_workflow(lines, cust_name) {
+        console.log('AAAAAA');
+    }
+
 });
+
+async function trigger_workflow(lines, cust_name) {
+    // const retData = await executeHttpRequest(
+    //     {destinationName: 'OrderApproval', jwt: jwt},
+    //     {method: 'post', 
+    //      url: '/workflow/rest/v1/workflow-instances',
+    //     data: {
+    //         "definitionId": "us10.da3646aatrial.orderapproval.orderapproval",
+    //         "context": {
+    //             "orderId": lines.ID,
+    //             "customerId": lines.customer_ID,
+    //             "customerName": cust_name,
+    //             "totalPrice": lines.totalPrice.toString(),
+    //             "orderNumber": lines.orderNumber,
+    //             "active": true
+    //         }
+    //     }
+    //     });
+}
 
 async function approve_order(req) {
     //Update orderStatus with comment received

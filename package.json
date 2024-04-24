@@ -17,11 +17,16 @@
     },
     "devDependencies": {
         "@sap/ux-specification": "^1.102.15",
+        "chai": "^4.4.1",
+        "chai-as-promised": "^7.1.1",
+        "chai-subset": "^1.6.0",
+        "jest": "^29.7.0",
         "rimraf": "^3.0.2",
         "sqlite3": "^5.0.4"
     },
     "scripts": {
         "start": "cds run",
+        "jest": "npx jest --silent",
         "watch-smartshop-cust-ui": "cds watch --open smartshop-cust-ui/webapp/index.html?sap-ui-xx-viewCache=false",
         "undeploy": "cf undeploy smartshop --delete-services --delete-service-keys --delete-service-brokers",
         "build": "rimraf resources mta_archives && mbt build --mtar archive",
@@ -30,7 +35,7 @@
         "watch-smartshop-ord-ui": "cds watch --open smartshop-ord-ui/webapp/index.html?sap-ui-xx-viewCache=false"
     },
     "engines": {
-        "node": "^16.15"
+        "node": "^18.18"
     },
     "eslintConfig": {
         "extends": "eslint:recommended",

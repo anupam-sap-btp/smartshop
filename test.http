@@ -1,0 +1,44 @@
+### Get a product
+GET http://localhost:4004/master/Products(ID=1002,IsActiveEntity=true)
+
+
+### Add Stock
+POST http://localhost:4004/master/Products(ID=1001,IsActiveEntity=true)/AddStock
+Content-Type: application/json
+
+{
+    "stock": 1
+}
+
+### Get Orders
+GET http://localhost:4004/transaction/Orders
+
+### Create Order
+POST http://localhost:4004/transaction/Orders
+Content-Type: application/json
+
+{
+    "orderNo": 9002,
+    "customer_ID": 901
+}
+
+###Get Orders
+GET http://localhost:4004/transaction/Orders(ID=85a88263-6157-4ba7-82f8-38ac30715d52,IsActiveEntity=false)/items
+
+### Add items to oders
+POST http://localhost:4004/transaction/Orders(ID=85a88263-6157-4ba7-82f8-38ac30715d52,IsActiveEntity=false)/items
+Content-Type: application/json
+
+{
+        
+        "itemNo": 1,
+        "product_ID": 1001,
+        "quantity": 3,
+        "unit": "PC"
+}
+
+###
+POST http://localhost:4004/transaction/Orders(ID=85a88263-6157-4ba7-82f8-38ac30715d52,IsActiveEntity=false)/draftActivate
+Content-Type: application/json
+
+{}
